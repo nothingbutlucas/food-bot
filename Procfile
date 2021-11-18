@@ -1,1 +1,1 @@
-bot: python3 main_previo.py
+bot: python3 main.py
