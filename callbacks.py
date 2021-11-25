@@ -1,7 +1,22 @@
+# Importamos las librerias de PTB
+# -
+# We import PTB libraries
+
 from telegram import InlineKeyboardMarkup, ParseMode
+
+# Importamos los archivos de constantes y renders para poder usarlos
+# -
+# We import the constants and renders files to be able to use them.
+
+
 from renders import render_main, render_recipes, render_recipe, render_ingredients, render_to_cook, render_lets_cook, \
     render_about
 
+# Generamos la función main que captura el query, para luego poder editar el mensaje y llamamos con un render
+# al main
+# -
+# We generate the main function that captures the query, so we can then edit the message and call with a render
+# to the main
 
 def main(update, context):
     query = update.callback_query
@@ -14,6 +29,8 @@ def main(update, context):
         parse_mode=ParseMode.HTML,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
+
+# Generamos la función
 
 
 def main_recipes(update, context):
