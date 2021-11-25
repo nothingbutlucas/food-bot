@@ -59,20 +59,7 @@ def render_recipes(update, context):
     keyboard = list()
     keyboard_00 = list()
 
-    if user_language == 'en':
-        text = f'Here are the recipes, touch them to see the ingredients'
-
-        for x, recipe in enumerate(recipes):
-            recipe = recipe.replace("-", " ")
-            keyboard_00.append(InlineKeyboardButton(text=recipe, callback_data=f'{x}'))
-            if len(keyboard_00) < 2:
-                pass
-            else:
-                keyboard.append(keyboard_00)
-                keyboard_00 = list()
-        keyboard.append([InlineKeyboardButton(text="🔙 Main", callback_data=f'main')])
-    else:
-
+    if user_language == 'es':
         text = f'Acá estan las recetas, toca una para ver los ingredientes'
 
         for x, recipe in enumerate(recipes):
@@ -84,6 +71,19 @@ def render_recipes(update, context):
                 keyboard.append(keyboard_00)
                 keyboard_00 = list()
         keyboard.append([InlineKeyboardButton(text="🔙 Main", callback_data=f'main')])
+    else:
+        text = f'Here are the recipes, touch them to see the ingredients'
+
+        for x, recipe in enumerate(recipes):
+            recipe = recipe.replace("-", " ")
+            keyboard_00.append(InlineKeyboardButton(text=recipe, callback_data=f'{x}'))
+            if len(keyboard_00) < 2:
+                pass
+            else:
+                keyboard.append(keyboard_00)
+                keyboard_00 = list()
+        keyboard.append([InlineKeyboardButton(text="🔙 Main", callback_data=f'main')])
+
     return text, keyboard
 
 
@@ -188,18 +188,17 @@ def render_to_cook(update, context):
                 keyboard_00 = list()
 
         context.user_data['ingredients'] = ingredientes_menu
-        if user_language == 'en':
-
-            text = "<b>Choose the ingredients and I'll see what you can Let's cook!</b>"
-
-            keyboard.append([InlineKeyboardButton(text="👨‍🍳 Let's cook! 👩‍🍳", callback_data=f'lets_cook')])
-            keyboard.append([InlineKeyboardButton(text="🔙 Main 🔙", callback_data=f'main')])
-        else:
-
+        if user_language == 'es':
             text = "<b>Elegí los ingredientes y yo veo que podes A cocinar!</b>"
 
             keyboard.append([InlineKeyboardButton(text="👨‍🍳 A cocinar! 👩‍🍳", callback_data=f'lets_cook')])
             keyboard.append([InlineKeyboardButton(text="🔙 Menu 🔙", callback_data=f'main')])
+
+        else:
+            text = "<b>Choose the ingredients and I'll see what you can Let's cook!</b>"
+
+            keyboard.append([InlineKeyboardButton(text="👨‍🍳 Let's cook! 👩‍🍳", callback_data=f'lets_cook')])
+            keyboard.append([InlineKeyboardButton(text="🔙 Main 🔙", callback_data=f'main')])
 
         context.user_data['keyboard'] = keyboard
 
@@ -232,18 +231,18 @@ def update_render_to_cook(update, context):
             keyboard.append(keyboard_00)
             keyboard_00 = list()
     context.user_data['ingredients'] = new_ingredients
-    if user_language == 'en':
-
-        text = "<b>Keep choosing and when you are done, click on Let's cook!</b>"
-
-        keyboard.append([InlineKeyboardButton(text="👨‍🍳 Let's cook! 👩‍🍳", callback_data=f'lets_cook')])
-        keyboard.append([InlineKeyboardButton(text="🔙 Main 🔙", callback_data=f'main')])
-    else:
-
+    if user_language == 'es':
         text = "<b>Seguí eligiendo y cuando ya estes, apreta A cocinar!</b>"
 
         keyboard.append([InlineKeyboardButton(text="👨‍🍳 A cocinar! 👩‍🍳", callback_data=f'lets_cook')])
         keyboard.append([InlineKeyboardButton(text="🔙 Menu 🔙", callback_data=f'main')])
+
+    else:
+        text = "<b>Keep choosing and when you are done, click on Let's cook!</b>"
+
+        keyboard.append([InlineKeyboardButton(text="👨‍🍳 Let's cook! 👩‍🍳", callback_data=f'lets_cook')])
+        keyboard.append([InlineKeyboardButton(text="🔙 Main 🔙", callback_data=f'main')])
+
     return text, keyboard
 
 

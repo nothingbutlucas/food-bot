@@ -71,13 +71,15 @@ def handle_help(update, context):
     if user_language == 'es':
         mensaje = 'Usa /start para ver el menú principal. ' \
                   '\nTodas mis funcionalidades se encuentran ahí.' \
-                  '\nEl idioma lo capturo directamente de tu usuario de telegram :) (Depende del idioma en el que tengas' \
-                  'instalado la app). Por ahora soporto inglés por defecto y español.'
+                  '\nEl idioma lo capturo directamente de tu usuario de telegram :) ' \
+                  '(Depende del idioma en el que tengas instalada la app). Por ahora soporto inglés por defecto ' \
+                  'y español.'
     else:
         mensaje = 'Use /start to see the main menu. ' \
                   '\nAll my features are there. ' \
-                  '\nThe language is captured directly from your telegram user :) (It depends on the language in which ' \
-                  'you have installed the app). For now I support english by default and spanish.'
+                  '\nThe language is captured directly from your telegram user :) ' \
+                  '(It depends on the language in which you have installed the app). ' \
+                  'For now I support english by default and spanish.'
 
     update.message.reply_text(
         text=mensaje,
