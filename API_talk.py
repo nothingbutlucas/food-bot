@@ -3,18 +3,30 @@ from constants import LINK_API
 
 
 def request_recipes():
+    print("func -> request_recipes")
     recipes = requests.get(f"{LINK_API}/foods/recipes")
     recipes = recipes.json()
     return recipes
 
 
 def request_recipe(query):
+    print("func -> request_recipe")
     recipe = requests.get(f"{LINK_API}/foods/id/{query.data}")
     recipe = recipe.json()
     return recipe
 
 
 def request_foods():
+    print("func -> request_foods")
     foods = requests.get(f"{LINK_API}/foods")
     foods = foods.json()
     return foods
+
+
+def request_step_by_step(recipe_name):
+    print("func -> request_step_by_step")
+    foods = requests.get(f"{LINK_API}/foods/step-by-step/{recipe_name}")
+    foods = foods.json()
+    return foods
+
+

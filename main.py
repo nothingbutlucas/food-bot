@@ -62,12 +62,14 @@ logger = logging.getLogger(__name__)
 # Both infos are captured directly from the update.
 # Then the keyboard is captured from a function of the renders file, inside that keyboard, there is a button to go back
 # to the main menu. Because the idea is that the bot is managed with buttons and it is not necessary to type anything :)
-# Depending on the language that the user has in the telegram, I answer in English by default or in case the user is in Spanish, in Spanish.
+# Depending on the language that the user has in the telegram, I answer in English by default or in case the user is in
+# Spanish, in Spanish.
 # is in Spanish, in Spanish
 # Then just for security, the text sent by the user is sent to the administrator.
 
 
 def handle_message(update, context):
+    print("func -> handle_message")
     # print("Dentro de handle_messages")
     user_first_name = update.effective_user['first_name']
     user_language = update.effective_user['language_code']
@@ -103,6 +105,7 @@ def handle_message(update, context):
 
 
 def error_handler(update, context):
+    print("func -> error_handler ❌")
     try:
         raise context.error
     except telegram.TelegramError as error:
@@ -116,6 +119,7 @@ def error_handler(update, context):
 
 
 def main_bot() -> None:
+    print("func -> main_bot 🤖")
     updater = Updater(token=TOKEN, use_context=True)
     bot = telegram.Bot(token=TOKEN)
     bot.set_my_commands(
@@ -146,7 +150,7 @@ def main_bot() -> None:
     dp.add_handler(MessageHandler(Filters.text, handle_message))
     dp.add_error_handler(error_handler)
     updater.start_polling()
-    print('Bot esta más vivo que vivin')
+    print('Bot esta más vivo que vivin 🤖')
     updater.idle()
 
 

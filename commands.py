@@ -24,7 +24,7 @@ from renders import render_main
 
 
 def handle_start(update, context):
-    # print("Dentro de handle_start")
+    print("func -> handle_start")
 
     if update.message.chat.type == 'private':
 
@@ -50,6 +50,8 @@ def handle_start(update, context):
 # the operation was cancelled and very important: it exits the context with a ConversationHandler.END
 
 def cancel(update, context):
+    print("func -> cancel")
+
     user_language = update.effective_user['language_code']
 
     if user_language == 'es':
@@ -66,6 +68,8 @@ def cancel(update, context):
 
 
 def handle_help(update, context):
+    print("func -> handle_help")
+
     user_language = update.effective_user['language_code']
 
     if user_language == 'es':

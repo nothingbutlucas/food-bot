@@ -1,57 +1,55 @@
 from telegram import InlineKeyboardButton
+from constants import *
+from API_talk import request_recipe, request_recipes, request_foods, request_step_by_step
+import emoji
 
-from API_talk import request_recipe, request_recipes, request_foods
+emojize = emoji.emojize
 
 
 def render_back_menu():
+    print("func -> render_back_menu")
     keyboard = [[InlineKeyboardButton(text="🔙 Main", callback_data='main')]]
     return keyboard
 
 
 def render_main(update, context):
+    print("func -> render_main")
     user_first_name = update.effective_user['first_name']
     user_language = update.effective_user['language_code']
 
     if user_language == 'es':
         text = f'Hola, {user_first_name}!'
-
-        keyboard = [
-            [
-                InlineKeyboardButton(text='📜 Ver recetas', callback_data='recipes')
-            ],
-            [
-                InlineKeyboardButton(text='🧪 Ver Ingredientes', callback_data='ingredients')
-            ],
-            [
-                InlineKeyboardButton(text='🥗 Ver que podes cocinar', callback_data='what_u_can_cook')
-            ],
-            [
-                InlineKeyboardButton(text='📱 Acerca de', callback_data='about')
-            ],
-        ]
+        recipes = '📜 Ver recetas'
+        ingredients = '🧪 Ver Ingredientes'
+        what_cook = '🥗 Ver que podes cocinar'
+        about = '📱 Acerca de'
 
     else:
         text = f'Hi, {user_first_name}!'
-
-        keyboard = [
-            [
-                InlineKeyboardButton(text='📜 See recipes', callback_data='recipes')
-            ],
-            [
-                InlineKeyboardButton(text='🧪 See Ingredients', callback_data='ingredients')
-            ],
-            [
-                InlineKeyboardButton(text='🥗 See what u can cook', callback_data='what_u_can_cook')
-            ],
-            [
-                InlineKeyboardButton(text='📱 About', callback_data='about')
-            ],
-        ]
+        recipes = '📜 See recipes'
+        ingredients = '🧪 See Ingredients'
+        what_cook = '🥗 See what u can cook'
+        about = '📱 About'
+    keyboard = [
+        [
+            InlineKeyboardButton(text=recipes, callback_data='recipes')
+        ],
+        [
+            InlineKeyboardButton(text=ingredients, callback_data='ingredients')
+        ],
+        [
+            InlineKeyboardButton(text=what_cook, callback_data='what_u_can_cook')
+        ],
+        [
+            InlineKeyboardButton(text=about, callback_data='about')
+        ],
+    ]
 
     return text, keyboard
 
 
 def render_recipes(update, context):
+    print("func -> render_recipes")
     recipes = request_recipes()
 
     user_language = update.effective_user['language_code']
@@ -61,39 +59,61 @@ def render_recipes(update, context):
 
     if user_language == 'es':
         text = f'Acá estan las recetas, toca una para ver los ingredientes'
+        menu = MENU_ES
 
-        for x, recipe in enumerate(recipes):
-            recipe = recipe.replace("-", " ")
-            keyboard_00.append(InlineKeyboardButton(text=recipe, callback_data=f'{x}'))
-            if len(keyboard_00) < 2:
-                pass
-            else:
-                keyboard.append(keyboard_00)
-                keyboard_00 = list()
-        keyboard.append([InlineKeyboardButton(text="🔙 Main", callback_data=f'main')])
     else:
         text = f'Here are the recipes, touch them to see the ingredients'
+        menu = MENU_EN
+    for x, recipe in enumerate(recipes):
+        recipe = recipe.replace("-", " ")
+        keyboard_00.append(InlineKeyboardButton(text=recipe, callback_data=f'{x}'))
+        if len(keyboard_00) == 2:
+            keyboard.append(keyboard_00)
+            keyboard_00 = list()
+    if len(keyboard_00) == 1:
+        keyboard.append(keyboard_00)
+    keyboard.append([InlineKeyboardButton(text=menu, callback_data=f'main')])
 
-        for x, recipe in enumerate(recipes):
-            recipe = recipe.replace("-", " ")
-            keyboard_00.append(InlineKeyboardButton(text=recipe, callback_data=f'{x}'))
-            if len(keyboard_00) < 2:
-                pass
-            else:
-                keyboard.append(keyboard_00)
-                keyboard_00 = list()
-        keyboard.append([InlineKeyboardButton(text="🔙 Main", callback_data=f'main')])
+    return text, keyboard
+
+
+def render_step_by_step(update, context):
+    print("func -> render_step_by_step")
+    user_language = update.effective_user['language_code']
+
+    query = update.callback_query
+    query.answer()
+    step_by_step = request_step_by_step(query.data)
+    step_by_step = str(step_by_step[0]).replace('.', '\n')
+    if len(step_by_step) < 1:
+        step_by_step = "El paso a paso estará disponible pronto 🙂"
+
+    if user_language == 'es':
+        recetas = "Volver a recetas"
+        text = step_by_step
+    else:
+        recetas = "Back to recipes"
+        text = step_by_step
+
+    keyboard = list()
+
+    keyboard.append([InlineKeyboardButton(text=f"🔙{recetas}🔙", callback_data=f'recipes')])
 
     return text, keyboard
 
 
 def render_recipe(update, context):
+    print("func -> render_recipe")
     user_language = update.effective_user['language_code']
 
     query = update.callback_query
-
     query.answer()
 
+    try:
+        int(query.data)
+    except ValueError:
+        print("Go to render step by step")
+        return render_step_by_step(update, context)
     recipe = request_recipe(query)
 
     recipe_name = ''
@@ -102,6 +122,7 @@ def render_recipe(update, context):
     m_ingredients = ''
     s_ingredients = ''
     text = ''
+    name_step_by_step = recipe["name"]
 
     try:
         name = (recipe["name"]).replace("-", " ")
@@ -127,20 +148,25 @@ def render_recipe(update, context):
         if user_language == 'es':
             text = f"<b><u>{recipe_name}</u></b>" \
                    f"\n\n<i>Ingredientes principales:</i>" \
-                   f"\n {m_ingredients}" \
+                   f"\n{m_ingredients}" \
                    f"\n<i>Ingredientes secundarios:</i>" \
-                   f"\n {s_ingredients}"
+                   f"\n{s_ingredients}"
         else:
             text = f"<b><u>{recipe_name}</u></b>" \
                    f"\n\n<i>Main ingredients:</i>" \
-                   f"\n {m_ingredients}" \
+                   f"\n{m_ingredients}" \
                    f"\n<i>Secondary ingredients:</i>" \
-                   f"\n {s_ingredients}"
-    keyboard = render_back_menu()
+                   f"\n{s_ingredients}"
+    keyboard = list()
+
+    keyboard.append([InlineKeyboardButton(text="Ver paso a paso 🦶", callback_data=f'{name_step_by_step}')])
+    keyboard.append([InlineKeyboardButton(text="🔙 Menu 🔙", callback_data=f'main')])
+
     return text, keyboard
 
 
 def render_ingredients(update, context):
+    print("func -> render_ingredients")
     ingredientes_menu = []
     foods = request_foods()
     text = ''
@@ -150,6 +176,8 @@ def render_ingredients(update, context):
             if ingredient not in ingredientes_menu:
                 ingredientes_menu.append(ingredient)
 
+    ingredientes_menu = sorted(ingredientes_menu)
+
     for ingredient in ingredientes_menu:
         text += f"· {ingredient}\n"
 
@@ -158,6 +186,7 @@ def render_ingredients(update, context):
 
 
 def render_to_cook(update, context):
+    print("func -> render_to_cook")
     if context.user_data.get('ingredients') is not None:
         print("Nos vamos al update del render to cook")
         return update_render_to_cook(update, context)
@@ -180,7 +209,7 @@ def render_to_cook(update, context):
 
         for x, ingredient in enumerate(ingredientes_menu):
             ingredient = f"{ingredient}"
-            if len(keyboard_00) < 2:
+            if len(keyboard_00) < 2 or ingredient == ingredients[-1]:
                 keyboard_00.append(InlineKeyboardButton(text=ingredient, callback_data=f"{ingredient}"))
             else:
                 keyboard_00.append(InlineKeyboardButton(text=ingredient, callback_data=f"{ingredient}"))
@@ -206,8 +235,9 @@ def render_to_cook(update, context):
 
 
 def update_render_to_cook(update, context):
-    user_language = update.effective_user['language_code']
+    print("func -> update_render_to_cook")
 
+    user_language = update.effective_user['language_code']
     ingredients = context.user_data.get('ingredients')
     query = update.callback_query
     query.answer()
@@ -224,7 +254,7 @@ def update_render_to_cook(update, context):
             else:
                 ingredient = f"{ingredient[2:]}"
         new_ingredients.append(ingredient)
-        if len(keyboard_00) < 2:
+        if len(keyboard_00) < 2 or ingredient == ingredients[-1]:
             keyboard_00.append(InlineKeyboardButton(text=ingredient, callback_data=f"{ingredient}"))
         else:
             keyboard_00.append(InlineKeyboardButton(text=ingredient, callback_data=f"{ingredient}"))
@@ -247,6 +277,8 @@ def update_render_to_cook(update, context):
 
 
 def render_lets_cook(update, context):
+    print("func -> render_lets_cook")
+
     user_language = update.effective_user['language_code']
     query = update.callback_query
     query.answer()
@@ -261,8 +293,8 @@ def render_lets_cook(update, context):
     foods = request_foods()
     can_cook = list()
     for x, food in enumerate(foods):
-        food = foods[str(x)]["name"] + " " + str(foods[str(x)]["main-ingredients"]) + " " + str(
-            foods[str(x)]["secondary-ingredients"])
+        food = f'{foods[str(x)]["name"]} {foods[str(x)]["main-ingredients"]} ' \
+               f'{foods[str(x)]["secondary-ingredients"]}'
         main_ingredients = foods[str(x)]["main-ingredients"]
         have_ingredient = list()
         for ingredient in main_ingredients:
@@ -291,6 +323,8 @@ def render_lets_cook(update, context):
 
 
 def render_about(update, context):
+    print("func -> render_about")
+
     user_language = update.effective_user['language_code']
     query = update.callback_query
     query.answer()

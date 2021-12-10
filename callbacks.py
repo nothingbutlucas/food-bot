@@ -18,7 +18,9 @@ from renders import render_main, render_recipes, render_recipe, render_ingredien
 # We generate the main function that captures the query, so we can then edit the message and call with a render
 # to the main
 
+
 def main(update, context):
+    print("func -> main")
     query = update.callback_query
     query.answer()
 
@@ -30,10 +32,12 @@ def main(update, context):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# Generamos la función
+# Y se repite lo mismo para los distintos menus, se captura el query, se llama a la función de los renders y se
+# manda el mensaje al usuario
 
 
 def main_recipes(update, context):
+    print("func -> main_recipes")
     query = update.callback_query
     query.answer()
 
@@ -47,6 +51,7 @@ def main_recipes(update, context):
 
 
 def see_recipe(update, context):
+    print("func -> see_recipe")
     query = update.callback_query
     query.answer()
 
@@ -64,6 +69,7 @@ def see_recipe(update, context):
 
 
 def ingredients(update, context):
+    print("func -> ingredients")
     query = update.callback_query
     query.answer()
 
@@ -76,7 +82,7 @@ def ingredients(update, context):
 
 
 def what_cook(update, context):
-    print("Estamos en what_cook")
+    print("func -> what_cook")
     query = update.callback_query
     query.answer()
 
@@ -89,6 +95,7 @@ def what_cook(update, context):
 
 
 def lets_cook(update, context):
+    print("func -> lets_cook")
     user_language = update.effective_user['language_code']
 
     query = update.callback_query
@@ -132,6 +139,7 @@ def lets_cook(update, context):
 
 
 def about(update, context):
+    print("func -> about")
     query = update.callback_query
     query.answer()
 
