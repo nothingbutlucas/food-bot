@@ -1,6 +1,7 @@
 import os
 TOKEN = os.environ['TOKEN']
 ADMIN = os.environ["ADMIN"]
+COOK = os.environ["COOK"]
 LINK_API = "https://plant-base-food-api.herokuapp.com"
 # LINK_API = "http://localhost:8000"
 

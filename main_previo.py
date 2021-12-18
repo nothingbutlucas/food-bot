@@ -3,7 +3,7 @@ from telegram.ext import Updater, CommandHandler
 
 
 def handle_start(update, context):
-    print("Dentro de handle_messages")
+    print("func -> handle_start_previo")
     user_first_name = update.effective_user['first_name']
     user_language = update.effective_user['language_code']
 
