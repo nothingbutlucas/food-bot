@@ -30,7 +30,7 @@ from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, Conve
 # -
 # Well and here I am importing the files I am working with, they are all in the same directory as the main one
 
-from callbacks import main_recipes, see_recipe, main, lets_cook, what_cook, ingredients, about
+from callbacks import main_recipes, see_recipe, main, lets_cook, what_cook, ingredients, about, see_step_by_step
 from constants import *
 from commands import handle_start, handle_help
 from renders import render_back_menu
@@ -133,6 +133,7 @@ def main_bot() -> None:
     dp = updater.dispatcher
     dp.add_handler(CommandHandler('start', handle_start))
     dp.add_handler(CommandHandler('help', handle_help))
+    dp.add_handler(CallbackQueryHandler(pattern='step_by_step', callback=see_step_by_step))
     dp.add_handler(CallbackQueryHandler(pattern=f'main', callback=main))
     dp.add_handler(CallbackQueryHandler(pattern='ingredients', callback=ingredients))
     dp.add_handler(CallbackQueryHandler(pattern=f'lets_cook', callback=lets_cook))

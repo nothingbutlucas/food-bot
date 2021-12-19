@@ -1,16 +1,17 @@
 # Importamos las librerias de PTB
 # -
 # We import PTB libraries
-
-from telegram import InlineKeyboardMarkup, ParseMode
+import query as query
+from telegram import InlineKeyboardMarkup, ParseMode, InlineKeyboardButton, ReplyKeyboardRemove
 
 # Importamos los archivos de constantes y renders para poder usarlos
 # -
 # We import the constants and renders files to be able to use them.
-
+from telegram.ext import ConversationHandler
 
 from renders import render_main, render_recipes, render_recipe, render_ingredients, render_to_cook, render_lets_cook, \
-    render_about
+    render_about, render_step_by_step
+
 
 # Generamos la función main que captura el query, para luego poder editar el mensaje y llamamos con un render
 # al main
@@ -31,6 +32,7 @@ def main(update, context):
         parse_mode=ParseMode.HTML,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
+
 
 # Y se repite lo mismo para los distintos menus, se captura el query, se llama a la función de los renders y se
 # manda el mensaje al usuario
@@ -101,41 +103,55 @@ def lets_cook(update, context):
     query = update.callback_query
     query.answer()
 
-    text, keyboard = render_lets_cook(update, context)
+    foods, keyboard = render_lets_cook(update, context)
 
     if user_language == 'en':
-        main_ingredients = "Main ingredients: "
-        secondary_ingredients = "Secondary ingredients: "
+        prev_main_ingredients = "Main ingredients: "
+        prev_secondary_ingredients = "Secondary ingredients: "
         can_cook = "What can you cook with what you have?"
     else:
-        main_ingredients = "Ingredientes principales: "
-        secondary_ingredients = "Ingredientes secundarios: "
+        prev_main_ingredients = "Ingredientes principales: "
+        prev_secondary_ingredients = "Ingredientes secundarios: "
         can_cook = "¿Que puedes cocinar con lo que tienes?"
 
-    if type(text) is type(list()):
-        text_ = f'<b>{can_cook}</b>\n\n'
-        for x in text:
-            texto = x.split('[')
-            title = texto[0]
-            main_ings = texto[1]
-            main_ings = main_ings.replace("'", "")
-            main_ings = main_ings.replace("]", "")
-            secon_ings = texto[2]
-            secon_ings = secon_ings.replace("'", "")
-            secon_ings = secon_ings.replace("]", "")
-            if len(secon_ings) < 1:
-                secon_ings = "-"
-            text_ += f"<b><u>{title.replace('-', ' ')}</u></b>" \
-                     f"\n\n<b>{main_ingredients}</b>\n<i>{main_ings}</i>" \
-                     f"\n<b>{secondary_ingredients}</b>\n<i>{secon_ings}</i>" \
-                     f"\n\n"
-        text = text_
-        print("The user has not input output")
-    query.edit_message_text(
-        text=text,
-        parse_mode=ParseMode.HTML,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+    if isinstance(foods, list):
+        update.effective_message.reply_text(
+            text=can_cook,
+            parse_mode=ParseMode.HTML,
+            reply_markup=ReplyKeyboardRemove()
+        )
+        for food in foods:
+            str_main_ingredients = ''
+            str_secondary_ingredients = ''
+            food_name = food["name"]
+            main_ingredients = food["main_ingredients"]
+            secondary_ingredients = food["secondary_ingredients"]
+
+            for ingredient in main_ingredients:
+                str_main_ingredients += f'· {ingredient}\n'
+
+            for ingredient in secondary_ingredients:
+                str_secondary_ingredients += f'· {ingredient}\n'
+
+            response = f'<b><u>{food_name}</u></b>' \
+                       f'\n\n<b>{prev_main_ingredients}</b>\n<i>{str_main_ingredients}</i>' \
+                       f'\n<b>{prev_secondary_ingredients}</b>\n<i>{str_secondary_ingredients}</i>'
+
+            update.effective_message.reply_text(
+                text=response,
+                parse_mode=ParseMode.HTML,
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton(text="Ver paso a paso 🦶", callback_data=f'{food_name}')]
+                ])
+            )
+    else:
+        query.edit_message_text(
+            text=foods,
+            parse_mode=ParseMode.HTML,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+
+    return ConversationHandler.END
 
 
 def about(update, context):
@@ -144,6 +160,21 @@ def about(update, context):
     query.answer()
 
     text, keyboard = render_about(update, context)
+
+    query.edit_message_text(
+        text=text,
+        parse_mode=ParseMode.HTML,
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+
+def see_step_by_step(update, context):
+    print("func -> see_step_by_step")
+
+    query = update.callback_query
+    query.answer()
+
+    text, keyboard = render_step_by_step(update, context)
 
     query.edit_message_text(
         text=text,

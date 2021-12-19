@@ -1,4 +1,5 @@
 from telegram import InlineKeyboardButton
+
 from constants import *
 from API_talk import request_recipe, request_recipes, request_foods, request_step_by_step
 import emoji
@@ -83,8 +84,10 @@ def render_step_by_step(update, context):
 
     query = update.callback_query
     query.answer()
-    step_by_step = request_step_by_step(query.data)
-    step_by_step = str(step_by_step[0]).replace('.', '\n')
+
+    step_by_step = context.user_data.get('step_by_step')
+    step_by_step = str(step_by_step).replace(".", "\n")
+
     if len(step_by_step) < 1:
         step_by_step = "El paso a paso estará disponible pronto 🙂"
 
@@ -109,12 +112,15 @@ def render_recipe(update, context):
     query = update.callback_query
     query.answer()
 
-    try:
-        int(query.data)
-    except ValueError:
-        print("Go to render step by step")
-        return render_step_by_step(update, context)
-    recipe = request_recipe(query)
+    recipe, code = request_recipe(query)
+
+    if code != 200:
+        step_by_step, new_code = request_step_by_step(query.data)
+        if new_code != 200:
+            return render_to_cook(update, context)
+        else:
+            context.user_data['step_by_step'] = step_by_step
+            return render_step_by_step(update, context)
 
     recipe_name = ''
     main_ingredients = ''
@@ -122,9 +128,10 @@ def render_recipe(update, context):
     m_ingredients = ''
     s_ingredients = ''
     text = ''
-    name_step_by_step = recipe["name"]
+    step_by_step = ''
 
     try:
+        step_by_step = recipe["step-by-step"]
         name = (recipe["name"]).replace("-", " ")
         recipe_name = name
         main_ingredients = recipe["main-ingredients"]
@@ -157,9 +164,12 @@ def render_recipe(update, context):
                    f"\n{m_ingredients}" \
                    f"\n<i>Secondary ingredients:</i>" \
                    f"\n{s_ingredients}"
+
+    context.user_data['step_by_step'] = step_by_step[0]
+
     keyboard = list()
 
-    keyboard.append([InlineKeyboardButton(text="Ver paso a paso 🦶", callback_data=f'{name_step_by_step}')])
+    keyboard.append([InlineKeyboardButton(text="Ver paso a paso 🦶", callback_data='step_by_step')])
     keyboard.append([InlineKeyboardButton(text="🔙 Menu 🔙", callback_data=f'main')])
 
     return text, keyboard
@@ -202,10 +212,12 @@ def render_to_cook(update, context):
         keyboard_00 = list()
 
         for x, food in enumerate(foods):
-            ingredients = foods[str(x)]["main-ingredients"] + foods[str(x)]["secondary-ingredients"]
+            ingredients = foods[str(x)]["main-ingredients"]
             for ingredient in ingredients:
                 if ingredient not in ingredientes_menu:
                     ingredientes_menu.append(ingredient)
+
+        ingredientes_menu.sort()
 
         for x, ingredient in enumerate(ingredientes_menu):
             ingredient = f"{ingredient}"
@@ -293,16 +305,21 @@ def render_lets_cook(update, context):
     foods = request_foods()
     can_cook = list()
     for x, food in enumerate(foods):
-        food = f'{foods[str(x)]["name"]} {foods[str(x)]["main-ingredients"]} ' \
-               f'{foods[str(x)]["secondary-ingredients"]}'
+        food = {"name": foods[str(x)]["name"],
+                "main_ingredients": foods[str(x)]["main-ingredients"],
+                "secondary_ingredients": foods[str(x)]["secondary-ingredients"],
+                "step_by_step": foods[str(x)]["step-by-step"]}
+
+        # food = f'{foods[str(x)]["name"]} {foods[str(x)]["main-ingredients"]} {foods[str(x)]["secondary-ingredients"]}'
+
         main_ingredients = foods[str(x)]["main-ingredients"]
         have_ingredient = list()
+
         for ingredient in main_ingredients:
             if ingredient in new_ingredients:
                 have_ingredient.append(ingredient)
             if len(have_ingredient) == len(main_ingredients):
                 can_cook.append(food)
-
     if not can_cook and new_ingredients:
         new_ingredients = str(new_ingredients).replace('[', '')
         new_ingredients = str(new_ingredients).replace(']', '')
