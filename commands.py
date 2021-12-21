@@ -28,6 +28,11 @@ def handle_start(update, context):
 
     if update.message.chat.type == 'private':
 
+        users_ids = context.bot_data.get('message_chats')
+
+        if not users_ids:
+            users_ids = [ADMIN]
+
         text, keyboard = render_main(update, context)
 
         update.message.reply_text(
@@ -36,7 +41,10 @@ def handle_start(update, context):
             parse_mode=ParseMode.HTML
         )
 
-        if int(update.effective_message.chat_id) != int(ADMIN):
+        chat_id = update.effective_message.chat_id
+
+        if int(chat_id) != int(ADMIN) and chat_id not in users_ids:
+            users_ids.append(ADMIN)
             context.bot.sendMessage(
                 chat_id=ADMIN,
                 text="🌟 New User! 🌟"
@@ -77,13 +85,17 @@ def handle_help(update, context):
                   '\nTodas mis funcionalidades se encuentran ahí.' \
                   '\nEl idioma lo capturo directamente de tu usuario de telegram :) ' \
                   '(Depende del idioma en el que tengas instalada la app). Por ahora soporto inglés por defecto ' \
-                  'y español.'
+                  'y español.' \
+                  '\nMira el video de ejemplo de uso aquí' \
+                  '\n👉 https://youtu.be/ffgrUZghz6I'
     else:
         mensaje = 'Use /start to see the main menu. ' \
                   '\nAll my features are there. ' \
                   '\nThe language is captured directly from your telegram user :) ' \
                   '(It depends on the language in which you have installed the app). ' \
-                  'For now I support english by default and spanish.'
+                  'For now I support english by default and spanish.'\
+                  '\nTake a look to this video' \
+                  '\n👉 https://youtu.be/ffgrUZghz6I'
 
     update.message.reply_text(
         text=mensaje,

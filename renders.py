@@ -85,22 +85,28 @@ def render_step_by_step(update, context):
     query = update.callback_query
     query.answer()
 
-    step_by_step = context.user_data.get('step_by_step')
-    step_by_step = str(step_by_step).replace(".", "\n")
+    step_by_step = str(context.user_data.get('step_by_step'))
+    step_by_step = step_by_step.replace(".", "\n")
+    step_by_step = step_by_step.replace("'", "")
+    step_by_step = step_by_step.replace("[", "")
+    step_by_step = step_by_step.replace("]", "")
 
     if len(step_by_step) < 1:
         step_by_step = "El paso a paso estará disponible pronto 🙂"
 
     if user_language == 'es':
         recetas = "Volver a recetas"
+        main = "Volver al menu"
         text = step_by_step
     else:
         recetas = "Back to recipes"
+        main = "Back to the menu"
         text = step_by_step
 
     keyboard = list()
 
     keyboard.append([InlineKeyboardButton(text=f"🔙{recetas}🔙", callback_data=f'recipes')])
+    keyboard.append([InlineKeyboardButton(text=f"🔙{main}🔙", callback_data=f'main')])
 
     return text, keyboard
 
@@ -181,15 +187,15 @@ def render_ingredients(update, context):
     foods = request_foods()
     text = ''
     for x, food in enumerate(foods):
-        ingredients = foods[str(x)]["main-ingredients"] + foods[str(x)]["secondary-ingredients"]
+        ingredients = foods[str(x)]["main-ingredients"]
         for ingredient in ingredients:
             if ingredient not in ingredientes_menu:
                 ingredientes_menu.append(ingredient)
 
     ingredientes_menu = sorted(ingredientes_menu)
-
     for ingredient in ingredientes_menu:
-        text += f"· {ingredient}\n"
+        if len(ingredient) > 1:
+            text += f"· {ingredient}\n"
 
     keyboard = render_back_menu()
     return text, keyboard
@@ -354,8 +360,9 @@ def render_about(update, context):
                "\nTambién si tenes algún comentario o sugerencia, estaría genial que nos lo contaras a nuestro mail:" \
                "\ndevycoso@gmail.com"
         donate = "Apoyanos con un café! ☕"
-        follow_us = "Mira lo que hacemos!"
+        follow_us = "Ver lo que hacemos 👀"
         menu = "🔙 Menu"
+        code = "Ver código fuente 💻"
     else:
         text = "<b>Bot and API developed by devycoso</b>" \
                "\nWe are a developer and a cook" \
@@ -364,19 +371,24 @@ def render_about(update, context):
                "\nAlso, if you have any comments or suggestions, it would be great if you could send them to our " \
                "e-mail:" \
                "\ndevycoso@gmail.com"
-        donate = "Buy us a coffee!"
-        follow_us = "Look what we do!"
+        donate = "Buy us a coffee!  ☕"
+        follow_us = "Look what we do! 👀"
+        code = "Look the source code 💻"
         menu = "🔙 Main"
     keyboard = [
         [
-            InlineKeyboardButton(text=f'{donate} ☕', url='https://ko-fi.com/devycoso')
+            InlineKeyboardButton(text=f'{donate}', url='https://ko-fi.com/devycoso')
         ],
         [
-            InlineKeyboardButton(text=f'{follow_us} 👀', url='https://bio.link/devycoso')
+            InlineKeyboardButton(text=f'{follow_us}', url='https://bio.link/devycoso')
+        ],
+        [
+            InlineKeyboardButton(text=f"{code}", url='https://github.com/nothingbutlucas/food-bot')
         ],
         [
             InlineKeyboardButton(text=f"{menu}", callback_data=f'main')
         ]
+
     ]
 
     return text, keyboard

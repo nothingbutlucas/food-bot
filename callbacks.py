@@ -181,27 +181,3 @@ def see_step_by_step(update, context):
         parse_mode=ParseMode.HTML,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
-
-
-'''
-def handle_ver_codigo(update, context):
-    print("Dentro de handle_ver_codigo")
-    user_first_name = update.effective_user['first_name']
-    user_language = update.effective_user['language_code']
-    if user_language == 'es':
-        response = (f"Hola {user_first_name}! Puedes ver el codigo en GitHub usando el botón de abajo!"
-                    f"<i>De paso seguime ;)</i>")
-        button = f"Ver el codigo en GitHub"
-    else:
-        response = (f"Hi {user_first_name}! You can see the code on GitHub using the button below!"
-                    f"\n<i>By the way, follow me! ;)</i>")
-        button = f"See the code on GitHub"
-
-    update.message.reply_text(
-        text=response,
-        parse_mode="html",
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton(text=button, url='https://github.com/lucaslucasprogram/plant_base_food_bot')],
-        ])
-    )
-'''

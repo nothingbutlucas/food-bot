@@ -112,7 +112,7 @@ def error_handler(update, context):
         print(error.message)
         context.bot.sendMessage(
             chat_id=ADMIN,
-            text=error
+            text=str(error)
         )
 
 # Acá hago la función main_bot que no toma parametros, lo que hace esta función es ejecutar el bot

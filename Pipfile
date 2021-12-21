@@ -8,6 +8,7 @@ python-telegram-bot = "*"
 requests = "*"
 keyboard = "*"
 emoji = "*"
+query = "*"
 
 [dev-packages]
 

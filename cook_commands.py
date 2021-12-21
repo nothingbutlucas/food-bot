@@ -1,3 +1,5 @@
+# Code in development
+
 from telegram import ParseMode
 from telegram.ext import ConversationHandler
 
@@ -178,45 +180,8 @@ def create_new_recipe_check(update, context):
 
 
 def create_new_recipe_confirmation(update, context):
-    print("func -> create_new_recipe_confirmation")
-    user_language = update.effective_user['language_code']
-
-    recipe_name = context.user_data.get('recipe_name')
-    recipe_main_ingredients = context.user_data.get('recipe_main_ingredients')
-    recipe_secondary_ingredients = context.user_data.get('recipe_secondary_ingredients')
-    recipe_step_by_step = context.user_data.get('recipe_step_by_step')
-    recipe_step_by_step = recipe_step_by_step.replace(".", "\n")
-    recipe_new_recipe_image = context.user_data.get('recipe_new_recipe_image')
-
-    if user_language == "es":
-        response = f'Ey! Fantastico, mira cómo quedo:' \
-                   f'\n<b>1</b> - <u>Nombre de la receta:</u>' \
-                   f'\n<b>{recipe_name}</b>' \
-                   f'\n<b>2</b> - <u>Ingredientes principales:</u>' \
-                   f'\n<i>{recipe_main_ingredients}</i>' \
-                   f'\n<b>3</b> - <u>Ingredientes secundarios:</u>' \
-                   f'\n<i>{recipe_secondary_ingredients}</i>' \
-                   f'\n<b>4</b> - <u>Paso a paso:</u>' \
-                   f'\n{recipe_step_by_step}' \
-                   f'\n<b>5</b> - <u>Link:</u>' \
-                   f'\n{recipe_link}' \
-                   f'\n<b>6</b> - <u>Imagen</u>'
-        other_response = f'Enviame el número de la opción que deseas cambiar.' \
-                         f'\nSi esta todo bien, mandame /ok'
-    else:
-        response = f"pass"
-        other_response = f'pass'
-    update.message.reply_text(
-        text=response,
-        parse_mode=ParseMode.HTML,
-        photo=recipe_new_recipe_image
-    )
-    update.message.reply_text(
-        text=other_response,
-        parse_mode=ParseMode.HTML,
-    )
 
     return ConversationHandler.END
 
-
+# Code in development
 
